@@ -24,3 +24,8 @@ Hippocampal Volume in Older Adults at Risk of Cognitive Decline: 218 adults (mea
 
 O'Shea 2015: https://www.frontiersin.org/articles/10.3389/fnagi.2016.00298/full
 Not sleep - just showing reduced hippocampal volume in older adults is associated with decreased scores on the NIH Toolbox-Cognitive Battery
+
+Sabeti 2018: https://link.springer.com/article/10.1007/s40520-018-1030-x
+"multiple linear regressions, controlling for age, sex, education, sleep medication, and depression, to examine sleep characteristics in relation to hippocampal volume and cognitive performance in all the subjects and then stratified by cognition."
+Didn't find any significant relationships with hippocampal volume (adults 90+)
+Has a good review of hippocampal volume + sleep research in the intro
