@@ -29,3 +29,8 @@ Sabeti 2018: https://link.springer.com/article/10.1007/s40520-018-1030-x
 "multiple linear regressions, controlling for age, sex, education, sleep medication, and depression, to examine sleep characteristics in relation to hippocampal volume and cognitive performance in all the subjects and then stratified by cognition."
 Didn't find any significant relationships with hippocampal volume (adults 90+)
 Has a good review of hippocampal volume + sleep research in the intro
+
+https://academic.oup.com/sleep/article/37/3/445/2595943?login=true
+144 Gulf War Vets (mean age 45) 
+" The global PSQI score was positively correlated with lifetime and current posttraumatic stress disorder (PTSD) and current depressive symptoms (P < 0.001) and was higher in veterans with Gulf War Illness, trauma exposure, and those using psychotropic medication (P ≤ 0.03). After adjusting for these comorbid variables, age, intracranial volume, and multiple comparisons, global PSQI was inversely associated with total cortical and frontal gray matter volume (adjusted P ≤ 0.03). Within the frontal lobe, total PSQI was inversely associated with the superior and middle frontal, orbitofrontal, anterior cingulate, and frontal pole volumes (adjusted P ≤ 0.02). Examination of the 3-factor structure of the PSQI revealed that the associations were driven by perceived sleep quality."
+Did not find significant relationship between PSQI and hippocampal volume
