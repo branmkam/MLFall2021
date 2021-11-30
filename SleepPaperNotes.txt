@@ -34,3 +34,9 @@ https://academic.oup.com/sleep/article/37/3/445/2595943?login=true
 144 Gulf War Vets (mean age 45) 
 " The global PSQI score was positively correlated with lifetime and current posttraumatic stress disorder (PTSD) and current depressive symptoms (P < 0.001) and was higher in veterans with Gulf War Illness, trauma exposure, and those using psychotropic medication (P ≤ 0.03). After adjusting for these comorbid variables, age, intracranial volume, and multiple comparisons, global PSQI was inversely associated with total cortical and frontal gray matter volume (adjusted P ≤ 0.03). Within the frontal lobe, total PSQI was inversely associated with the superior and middle frontal, orbitofrontal, anterior cingulate, and frontal pole volumes (adjusted P ≤ 0.02). Examination of the 3-factor structure of the PSQI revealed that the associations were driven by perceived sleep quality."
 Did not find significant relationship between PSQI and hippocampal volume
+
+Fjell 2019: https://academic.oup.com/sleep/article/43/5/zsz280/5628807?login=true
+Used cross-sectional and logitudinal data, thousands of adult participants (UK biobank data)
+Has good figures and looked at individual PSQI components
+"No cross-sectional sleep—hippocampal volume relationships were found. However, worse sleep quality, efficiency, problems, and daytime tiredness were related to greater hippocampal volume loss over time, with high scorers showing 0.22% greater annual loss than low scorers. The relationship between sleep and hippocampal atrophy did not vary across age. Simulations showed that the observed longitudinal effects were too small to be detected as age-interactions in the cross-sectional analyses."
+
