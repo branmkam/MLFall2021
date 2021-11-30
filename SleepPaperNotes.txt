@@ -1,0 +1,11 @@
+Zotero Library: https://www.zotero.org/groups/4528663/comp562
+
+Taki 2012: https://www.sciencedirect.com/science/article/pii/S1053811911013541?casa_token=J3z3MpSICDUAAAAA:0Y35q0hY3_RS6iuLymQYz2VFP-qS6P_PP0VulweJVsYpEikRHCXNua2yDpcpUoUEnM8h7raIsA
+"We performed multiple regression analysis, in which regional gray matter volume was used as a dependent variable, and age, sex, duration of sleep, and intracranial volume were used as independent variables to investigate the correlation between hippocampal regional gray matter volume and duration of sleep. Intracranial volume was calculated by summing the gray matter, white matter, and CSF volumes derived from the aforementioned imaging process." (all in SPM8 which is a MRI analysis software I've used)
+"volume of the bilateral hippocampal body was significantly positively correlated with the duration of sleep during weekdays after adjusting for age, sex, and intracranial volume and after performing small-volume correction of the hippocampal ROI" (290 healthy children aged 5–18 years)
+
+Neylan 2010: https://www.sciencedirect.com/science/article/pii/S0006322310004294?casa_token=J6RxodUeRjkAAAAA:wOX2TXnIxfuTljV8kTb_CVIqH1xwhrYxBGssdEQsyiY1ceQBb0-tYR70PY6WMMWOx5h2CagiNw
+"Higher scores on the ISI, indicating worse insomnia, were associated with smaller volumes of the CA3/dentate subfields (r = −.48, p < .01) in the combined sample. Adding the ISI score as a predictor for CA3/dentate volume to a hierarchical linear regression model after first controlling for age and PTSD symptoms accounted for a 13% increase in incremental variance (t = −2.47, p = .02)."
+
+Riemann 2010: https://academic.oup.com/sleep/article/37/3/445/2595943?login=true
+Super small pilot study - just did spearmann correlations with 8 primary insomnia and 8 controls and found that patients with primary insomnia had reduced bilateral hippocampus volume
