@@ -21,3 +21,6 @@ Elcombe 2014: https://d1wqtxts1xzle7.cloudfront.net/45745324/Hippocampal_Volume_
 Hippocampal Volume in Older Adults at Risk of Cognitive Decline: 218 adults (mean age 67 years)
 "Smaller hippocampal volumes were strongly associated with poorer verbal learning and memory as well as diagnoses of either multiple or amnestic mild cognitive impairment. Based on univariate correlations, multivariable regressions were performed (controlling for age and total intracranial volume) to determine which modifiable risk factors were associated with hippocampal volume. For the left hippocampus, poor sleep efficiency and greater than five years untreated depressive illness remained significant predictors. For the right hippocampus, diabetes and low diastolic blood pressure remained significant predictors."
 "Although their contribution is small, lower sleep efficiency, low blood pressure, diabetes, and untreated depression are associated with reduced hippocampal volumes. Studies exploring the impact of early intervention for these risk factors on hippocampal integrity are warranted."
+
+O'Shea 2015: https://www.frontiersin.org/articles/10.3389/fnagi.2016.00298/full
+Not sleep - just showing reduced hippocampal volume in older adults is associated with decreased scores on the NIH Toolbox-Cognitive Battery
