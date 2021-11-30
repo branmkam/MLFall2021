@@ -9,3 +9,15 @@ Neylan 2010: https://www.sciencedirect.com/science/article/pii/S0006322310004294
 
 Riemann 2010: https://academic.oup.com/sleep/article/37/3/445/2595943?login=true
 Super small pilot study - just did spearmann correlations with 8 primary insomnia and 8 controls and found that patients with primary insomnia had reduced bilateral hippocampus volume
+
+Meerlo 2009: https://www.sciencedirect.com/science/article/pii/S1087079208000804?casa_token=eFJs5p9G6aUAAAAA:DDoUt4wKNLXFRXSzce0vmpTR0-3lWDNeegmpMiuJP1sQtIg1rsar-8MptSo7f4KRIuvT7edLlQ#bib80
+Older review of neural effects of sleep loss
+
+Nardo 2015: https://www.frontiersin.org/articles/10.3389/fpsyt.2015.00134/full
+"higher sleep disturbances were associated with significantly reduced gray matter volume in amygdala, hippocampus, anterior cingulate, and insula; This pattern was substantially confirmed in the PTSD group, but not in controls."
+
+
+Elcombe 2014: https://d1wqtxts1xzle7.cloudfront.net/45745324/Hippocampal_Volume_in_Older_Adults_at_Ri20160518-8516-3p1058.pdf?1463581426=&response-content-disposition=inline%3B+filename%3DHippocampal_Volume_in_Older_Adults_at_Ri.pdf&Expires=1638304768&Signature=cVdNIPhVmHvt0bUSUWhLnr0V0eQX1IAk8zeA6ofkIr9--j7lRlvwPRN4Q1QbLB73QkhDrEcpjlM8n3igUaGJ-ntFKKQIPuN5ZLJMGtW7jLQxqH8wvifzrPxygTPc80EYuFB8NlnSYd9int3S~DHPQuoLDidVbiMFIHwlOw2NFmn8~7ygnPy-mhyburTuO6eqqU7Egg4DVqjkwalLOdgVeGObga8TEZdNuHAW2iGouITCpMIEspWSCw6kmsPmjm~NUUf8fahSb~Ugr4Ox30spvH46yAj-31G8fhUCZtBZoLwpVUjGWwnam0VLeo-psafrvA1ZHPTpWZrocPtSC1PNaw__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA
+Hippocampal Volume in Older Adults at Risk of Cognitive Decline: 218 adults (mean age 67 years)
+"Smaller hippocampal volumes were strongly associated with poorer verbal learning and memory as well as diagnoses of either multiple or amnestic mild cognitive impairment. Based on univariate correlations, multivariable regressions were performed (controlling for age and total intracranial volume) to determine which modifiable risk factors were associated with hippocampal volume. For the left hippocampus, poor sleep efficiency and greater than five years untreated depressive illness remained significant predictors. For the right hippocampus, diabetes and low diastolic blood pressure remained significant predictors."
+"Although their contribution is small, lower sleep efficiency, low blood pressure, diabetes, and untreated depression are associated with reduced hippocampal volumes. Studies exploring the impact of early intervention for these risk factors on hippocampal integrity are warranted."
