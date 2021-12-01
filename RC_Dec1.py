@@ -7,44 +7,71 @@ import time
 #Rachel's code December 1st
 
 #import data
-df = pd.read_excel('CondensedDataandKey.xlsx',sheet_name='KeyAll')
+df_all = pd.read_excel('CondensedDataandKey.xlsx',sheet_name='data')
 
 
 #ignore this but don't delete - just lists of variabls in case I want to go back and add in
 #brain_vars = ['FS_L_Hippo_Vol', 'FS_L_Amygdala_Vol', 'FS_L_AccumbensArea_Vol', 'FS_R_Hippo_Vol', 'FS_R_Amygdala_Vol', 'FS_R_AccumbensArea_Vol']
+#main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol']
+#all_PSQI_vars =['PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7', 'PSQI_BedTime', 'PSQI_Min2Asleep', 'PSQI_GetUpTime', 'PSQI_AmtSleep', 'PSQI_Latency30Min', 'PSQI_WakeUp', 'PSQI_Bathroom', 'PSQI_Breathe', 'PSQI_Snore', 'PSQI_TooCold', 'PSQI_TooHot', 'PSQI_BadDream', 'PSQI_Pain', 'PSQI_Other', 'PSQI_Quality', 'PSQI_SleepMeds', 'PSQI_DayStayAwake', 'PSQI_DayEnthusiasm', 'PSQI_BedPtnrRmate']
+#all_NIH_CogBat_vars = ['PicSeq_Unadj', 'PicSeq_AgeAdj', 'CardSort_Unadj', 'CardSort_AgeAdj', 'Flanker_Unadj', 'Flanker_AgeAdj', 'ReadEng_Unadj', 'ReadEng_AgeAdj', 'PicVocab_Unadj', 'PicVocab_AgeAdj', 'ProcSpeed_Unadj', 'ProcSpeed_AgeAdj', 'ListSort_Unadj', 'ListSort_AgeAdj', 'CogFluidComp_Unadj', 'CogFluidComp_AgeAdj', 'CogEarlyComp_Unadj', 'CogEarlyComp_AgeAdj', 'CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
+#Notes: 
+# The fluid cognition composite: Dimensional Change Card Sort, Flanker, Picture Sequence Memory, List Sorting and Pattern Comparison. 
+# The crystalized cognition composite: Picture Vocabulary Test and the Oral Reading Recognition Test. 
 
+
+main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol','PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7','CogFluidComp_Unadj','CogFluidComp_AgeAdj','CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
+df = df_all[main_vars]
+df = df.dropna()
 
 #data cleanup
 #make gender binary numbers
 df['Gender'] = [0 if i == 'M' else 1 for i in df['Gender']]
 
-# The fluid cognition composite: Dimensional Change Card Sort, Flanker, Picture Sequence Memory, List Sorting and Pattern Comparison. 
-# The crystalized cognition composite: Picture Vocabulary Test and the Oral Reading Recognition Test. 
-
-main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol']
-all_PSQI_vars =['PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7', 'PSQI_BedTime', 'PSQI_Min2Asleep', 'PSQI_GetUpTime', 'PSQI_AmtSleep', 'PSQI_Latency30Min', 'PSQI_WakeUp', 'PSQI_Bathroom', 'PSQI_Breathe', 'PSQI_Snore', 'PSQI_TooCold', 'PSQI_TooHot', 'PSQI_BadDream', 'PSQI_Pain', 'PSQI_Other', 'PSQI_Quality', 'PSQI_SleepMeds', 'PSQI_DayStayAwake', 'PSQI_DayEnthusiasm', 'PSQI_BedPtnrRmate']
-all_NIH_CogBat_vars = ['PicSeq_Unadj', 'PicSeq_AgeAdj', 'CardSort_Unadj', 'CardSort_AgeAdj', 'Flanker_Unadj', 'Flanker_AgeAdj', 'ReadEng_Unadj', 'ReadEng_AgeAdj', 'PicVocab_Unadj', 'PicVocab_AgeAdj', 'ProcSpeed_Unadj', 'ProcSpeed_AgeAdj', 'ListSort_Unadj', 'ListSort_AgeAdj', 'CogFluidComp_Unadj', 'CogFluidComp_AgeAdj', 'CogEarlyComp_Unadj', 'CogEarlyComp_AgeAdj', 'CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
+age_dict = {'22-25': 1, '26-30': 2, '31-35': 3, '36+': 4}
+df['AgeCat'] = df['Age'].replace(age_dict)
 
 
-#take some columns - can paste directly from CSV and delete what needed here
-cols = 'Gender,MMSE_Score,PSQI_Min2Asleep,PSQI_AmtSleep,PSQI_Latency30Min,PSQI_WakeUp,PSQI_Bathroom,PSQI_Breathe,PSQI_Snore,PSQI_TooCold,PSQI_TooHot,PSQI_BadDream,PSQI_Pain,PSQI_Other,PSQI_Quality,PSQI_SleepMeds,PSQI_DayStayAwake,PSQI_DayEnthusiasm,PSQI_BedPtnrRmate,PicSeq_Unadj,PicSeq_AgeAdj,CardSort_Unadj,CardSort_AgeAdj,Flanker_Unadj,Flanker_AgeAdj,ReadEng_Unadj,ReadEng_AgeAdj,PicVocab_Unadj,PicVocab_AgeAdj,ProcSpeed_Unadj,ProcSpeed_AgeAdj,ListSort_Unadj,ListSort_AgeAdj,CogFluidComp_Unadj,CogFluidComp_AgeAdj,CogEarlyComp_Unadj,CogEarlyComp_AgeAdj,CogTotalComp_Unadj,CogTotalComp_AgeAdj,CogCrystalComp_Unadj,CogCrystalComp_AgeAdj,ER40_CR,ER40_CRT,ER40ANG,ER40FEAR,ER40HAP,ER40NOE,ER40SAD,AngAffect_Unadj,AngHostil_Unadj,AngAggr_Unadj,FearAffect_Unadj,FearSomat_Unadj,Sadness_Unadj,LifeSatisf_Unadj,MeanPurp_Unadj,PosAffect_Unadj,Friendship_Unadj,Loneliness_Unadj,PercHostil_Unadj,PercReject_Unadj,EmotSupp_Unadj,InstruSupp_Unadj,PercStress_Unadj,SelfEff_Unadj,FS_L_Hippo_Vol,FS_L_Amygdala_Vol,FS_L_AccumbensArea_Vol,FS_R_Hippo_Vol,FS_R_Amygdala_Vol,FS_R_AccumbensArea_Vol,WM_Task_Acc,WM_Task_Median_RT,WM_Task_2bk_Acc,WM_Task_2bk_Median_RT,WM_Task_0bk_Acc,WM_Task_0bk_Median_RT,WM_Task_0bk_Body_Acc,WM_Task_0bk_Body_Acc_Target,WM_Task_0bk_Body_Acc_Nontarget,WM_Task_0bk_Face_Acc,WM_Task_0bk_Face_Acc_Target,WM_Task_0bk_Face_ACC_Nontarget,WM_Task_0bk_Place_Acc,WM_Task_0bk_Place_Acc_Target,WM_Task_0bk_Place_Acc_Nontarget,WM_Task_0bk_Tool_Acc,WM_Task_0bk_Tool_Acc_Target,WM_Task_0bk_Tool_Acc_Nontarget,WM_Task_2bk_Body_Acc,WM_Task_2bk_Body_Acc_Target,WM_Task_2bk_Body_Acc_Nontarget,WM_Task_2bk_Face_Acc,WM_Task_2bk_Face_Acc_Target,WM_Task_2bk_Face_Acc_Nontarget,WM_Task_2bk_Place_Acc,WM_Task_2bk_Place_Acc_Target,WM_Task_2bk_Place_Acc_Nontarget,WM_Task_2bk_Tool_Acc,WM_Task_2bk_Tool_Acc_Target,WM_Task_2bk_Tool_Acc_Nontarget,WM_Task_0bk_Body_Median_RT,WM_Task_0bk_Body_Median_RT_Target,WM_Task_0bk_Body_Median_RT_Nontarget,WM_Task_0bk_Face_Median_RT,WM_Task_0bk_Face_Median_RT_Target,WM_Task_0bk_Face_Median_RT_Nontarget,WM_Task_0bk_Place_Median_RT,WM_Task_0bk_Place_Median_RT_Target,WM_Task_0bk_Place_Median_RT_Nontarget,WM_Task_0bk_Tool_Median_RT,WM_Task_0bk_Tool_Median_RT_Target,WM_Task_0bk_Tool_Median_RT_Nontarget,WM_Task_2bk_Body_Median_RT,WM_Task_2bk_Body_Median_RT_Target,WM_Task_2bk_Body_Median_RT_Nontarget,WM_Task_2bk_Face_Median_RT,WM_Task_2bk_Face_Median_RT_Target,WM_Task_2bk_Face_Median_RT_Nontarget,WM_Task_2bk_Place_Median_RT,WM_Task_2bk_Place_Median_RT_Target,WM_Task_2bk_Place_Median_RT_Nontarget,WM_Task_2bk_Tool_Median_RT,WM_Task_2bk_Tool_Median_RT_Target,WM_Task_2bk_Tool_Median_RT_Nontarget'
-colarr = cols.split(',')
+#split data into features and predictor
+def splitdata(df, feat, predictors):   
+    y = df[feat]
+    X = df[predictors]
+    return X, y
 
-#delete all unadjusted and WM_task, age not important here
-adjcols = []
-for i in colarr:
-    if not 'Unadj' in i and not 'WM_Task' in i:
-        adjcols.append(i)
-        
-        
-        
-        #bring data in
-X = df[adjcols]
+control_vars = ['Gender','AgeCat','FS_IntraCranial_Vol']
+pred_PSQI_tot_vars = ['PSQI_Score'] + control_vars
+X, y = splitdata(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 
-#get rid of any incomplete data
-for row in X.index:
-    if X.loc[row].isnull().values.any():
-        #print(row)
-        X = X.drop(labels=[row], axis='index')
 
-X = X.reset_index(drop=True)
+# #Code adapted from from trymanual and https://scikit-learn.org/stable/auto_examples/release_highlights/plot_release_highlights_0_23_0.html#sphx-glr-auto-examples-release-highlights-plot-release-highlights-0-23-0-py
+
+# from sklearn.model_selection import train_test_split
+# from sklearn.linear_model import PoissonRegressor
+# from sklearn.ensemble import HistGradientBoostingRegressor
+
+# # n_samples, n_features = 1000, 20
+# # rng = np.random.RandomState(0)
+# # X = rng.randn(n_samples, n_features)
+# # # positive integer target correlated with X[:, 5] with many zeros:
+# # y = rng.poisson(lam=np.exp(X[:, 5]) / 2)
+
+# #divide data into training and test sets
+# test_size = 0.25
+# control_vars = ['Gender','AgeCat','FS_IntraCranial_Vol']
+# pred_PSQI_tot_vars = ['PSQI_Score'] + control_vars
+# X, y = splitdata(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
+
+
+# #X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=rng)
+# glm = PoissonRegressor()
+# gbdt = HistGradientBoostingRegressor(loss="poisson", learning_rate=0.01)
+# glm.fit(X_train, y_train)
+# gbdt.fit(X_train, y_train)
+# print(glm.score(X_test, y_test))
+# print(gbdt.score(X_test, y_test))
+
+from sklearn import linear_model
+model = linear_model.Ridge()
+model.fit(X, y)
+model.coef_
