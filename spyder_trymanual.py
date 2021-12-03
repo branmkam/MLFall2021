@@ -1,4 +1,3 @@
-@@ -0,0 +1,147 @@
 #import
 import pandas as pd
 import numpy as np
@@ -59,7 +58,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, r
 
 
 #add bias term as first feature
-import numpy as np
 X_train_pad = np.concatenate( ( np.ones((X_train.shape[0], 1)), X_train ), axis = 1 )
 X_test_pad = np.concatenate( ( np.ones((X_test.shape[0], 1)), X_test ), axis = 1 )
 
@@ -72,8 +70,8 @@ print(p, 'features including bias (p)')
 
 import numpy as np
 def loglikelihood(w, X, y, alpha): 
-    for i in [w, X, y]:
-        print(i.shape)
+    # for i in [w, X, y]:
+    #     print(i.shape)
     #compute loglikelihood for current w, b, given the data X, y
     #w is a vector, b is a scalr, X is a n*p matrix and y is a vector.
     tmp = 1. + np.exp(-y*np.dot(X, w))
@@ -88,7 +86,7 @@ def loglikelihood(w, X, y, alpha):
     return -np.sum( np.log( tmp ) ) - penalty, gradVal + gradPenalty
 
 import matplotlib.pyplot as plt
-%matplotlib inline
+
 def gradient_ascent(f,x,init_step,iterations):  
     f_val,grad = f(x)                           # compute function value and gradient 
     f_vals = [f_val]
