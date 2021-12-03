@@ -3,6 +3,56 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+import regressors
+from regressors import stats
+
+#split data into features and predictor
+def splitdata(df, feat, predictors):   
+    y = df[feat]
+    X = df[predictors]
+    return X, y
+
+
+def splitdata_normalize(df, feat, predictors):  
+    df2= df[[feat] + predictors] #returns a numpy array
+    min_max_scaler = preprocessing.MinMaxScaler()
+    xy_scaled = min_max_scaler.fit_transform(df2.values)
+    df_scaled = pd.DataFrame(xy_scaled, columns=df2.columns)
+    y = df_scaled[feat]
+    X = df_scaled[predictors]
+    #X_int = pd.DataFrame(np.concatenate( ( np.ones((X.shape[0], 1)), X), axis = 1 ), columns = ['intercept'] + predictors)
+    return X, y
+
+
+def getcoeffandpvals(model, X, y):
+    coefs = [model.intercept_] + list(model.coef_)
+    pvals = pd.DataFrame(stats.coef_pval(model, X, y),  (['intercept']+X.columns.to_list()), columns=['pval'])
+    coeff_df = pd.DataFrame(coefs, (['intercept']+X.columns.to_list()), columns=['coeff'])
+    return pd.concat([coeff_df, pvals], axis=1)
+
+def runLinReg(df, feat, predictors):
+    X, y = splitdata_normalize(df, feat, predictors)
+
+    # Code from try1
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
+
+    linreg = LinearRegression(fit_intercept=True)
+    linreg.fit(X_train, y_train)
+    train_results = getcoeffandpvals(linreg, X_train, y_train)
+    
+    y_pred = linreg.predict(X_test)
+    actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
+    print(actualvspred.sort_values(by='Difference', ascending=False))
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    
+    return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 #Rachel's code December 1st
 
@@ -32,43 +82,25 @@ age_dict = {'22-25': 1, '26-30': 2, '31-35': 3, '36+': 4}
 df['AgeCat'] = df['Age'].replace(age_dict)
 
 
-#split data into features and predictor
-def splitdata(df, feat, predictors):   
-    y = df[feat]
-    X = df[predictors]
-    return X, y
-
 control_vars = ['Gender','AgeCat','FS_IntraCranial_Vol']
 pred_PSQI_tot_vars = ['PSQI_Score'] + control_vars
-X, y = splitdata(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
+pred_PSQI_comp_vars = ['PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars
 
 
+TotPSQI_HippoL_linreg, TotPSQI_HippoL_X_train, TotPSQI_HippoL_X_test, TotPSQI_HippoL_y_train, TotPSQI_HippoL_y_test, TotPSQI_HippoL_actualvspred, TotPSQI_HippoL_train_results= runLinReg(
+    df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 
 
-# Code from try1
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
-
-#train data
-from sklearn.linear_model import LinearRegression
-regressor = LinearRegression()
-regressor.fit(X_train, y_train)
-
-coeff_df = pd.DataFrame(regressor.coef_, X.columns, columns=['Coefficient'])
-coeff_df
-
-y_pred = regressor.predict(X_test)
-df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
-print(df.sort_values(by='Difference', ascending=False))
-
-from sklearn import metrics
-print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runLinReg(
+    df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
 
 
+CompPSQI_HippoL_linreg, CompPSQI_HippoL_X_train, CompPSQI_HippoL_X_test, CompPSQI_HippoL_y_train, CompPSQI_HippoL_y_test, CompPSQI_HippoL_actualvspred, CompPSQI_HippoL_train_results= runLinReg(
+    df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
+print(CompPSQI_HippoL_train_results)
 
-
+CompPSQI_HippoR_linreg, CompPSQI_HippoR_X_train, CompPSQI_HippoR_X_test, CompPSQI_HippoR_y_train, CompPSQI_HippoR_y_test, CompPSQI_HippoR_actualvspred, CompPSQI_HippoR_train_results= runLinReg(
+    df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
 
 
 
