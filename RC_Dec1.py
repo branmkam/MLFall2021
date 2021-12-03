@@ -43,6 +43,37 @@ pred_PSQI_tot_vars = ['PSQI_Score'] + control_vars
 X, y = splitdata(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 
 
+
+
+# Code from try1
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
+
+#train data
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(X_train, y_train)
+
+coeff_df = pd.DataFrame(regressor.coef_, X.columns, columns=['Coefficient'])
+coeff_df
+
+y_pred = regressor.predict(X_test)
+df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
+print(df.sort_values(by='Difference', ascending=False))
+
+from sklearn import metrics
+print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+
+
+
+
+
+
+
+
+
 # #Code adapted from from trymanual and https://scikit-learn.org/stable/auto_examples/release_highlights/plot_release_highlights_0_23_0.html#sphx-glr-auto-examples-release-highlights-plot-release-highlights-0-23-0-py
 
 # from sklearn.model_selection import train_test_split
@@ -71,7 +102,11 @@ X, y = splitdata(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 # print(glm.score(X_test, y_test))
 # print(gbdt.score(X_test, y_test))
 
-from sklearn import linear_model
-model = linear_model.Ridge()
-model.fit(X, y)
-model.coef_
+
+
+
+#ignore this
+# from sklearn import linear_model
+# model = linear_model.Ridge()
+# model.fit(X, y)
+# model.coef_
