@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import time
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Lasso
 from sklearn import metrics
 import regressors
 from regressors import stats
@@ -27,6 +27,11 @@ def splitdata_normalize(df, feat, predictors):
     #X_int = pd.DataFrame(np.concatenate( ( np.ones((X.shape[0], 1)), X), axis = 1 ), columns = ['intercept'] + predictors)
     return X, y
 
+def normalize_df(df):  
+    min_max_scaler = preprocessing.MinMaxScaler()
+    xy_scaled = min_max_scaler.fit_transform(df.values)
+    df_scaled = pd.DataFrame(xy_scaled, columns=df.columns)
+    return df_scaled
 
 def getcoeffandpvals(model, X, y):
     coefs = [model.intercept_] + list(model.coef_)
@@ -54,20 +59,33 @@ def runLinReg(df, feat, predictors):
     
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
+
+def runLinRegLasso(df, feat, predictors, alpha=1):
+    X, y = splitdata_normalize(df, feat, predictors)
+
+    # Code from try1
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
+
+    linreg = Lasso(fit_intercept=True, alpha=alpha)
+    linreg.fit(X_train, y_train)
+    train_results = getcoeffandpvals(linreg, X_train, y_train)
+    
+    y_pred = linreg.predict(X_test)
+    actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
+    print(actualvspred.sort_values(by='Difference', ascending=False))
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    
+    return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
+
+
+
 #Rachel's code December 1st
 
 #import data
 df_all = pd.read_excel('CondensedDataandKey.xlsx',sheet_name='data')
-
-
-#ignore this but don't delete - just lists of variabls in case I want to go back and add in
-#brain_vars = ['FS_L_Hippo_Vol', 'FS_L_Amygdala_Vol', 'FS_L_AccumbensArea_Vol', 'FS_R_Hippo_Vol', 'FS_R_Amygdala_Vol', 'FS_R_AccumbensArea_Vol']
-#main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol']
-#all_PSQI_vars =['PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7', 'PSQI_BedTime', 'PSQI_Min2Asleep', 'PSQI_GetUpTime', 'PSQI_AmtSleep', 'PSQI_Latency30Min', 'PSQI_WakeUp', 'PSQI_Bathroom', 'PSQI_Breathe', 'PSQI_Snore', 'PSQI_TooCold', 'PSQI_TooHot', 'PSQI_BadDream', 'PSQI_Pain', 'PSQI_Other', 'PSQI_Quality', 'PSQI_SleepMeds', 'PSQI_DayStayAwake', 'PSQI_DayEnthusiasm', 'PSQI_BedPtnrRmate']
-#all_NIH_CogBat_vars = ['PicSeq_Unadj', 'PicSeq_AgeAdj', 'CardSort_Unadj', 'CardSort_AgeAdj', 'Flanker_Unadj', 'Flanker_AgeAdj', 'ReadEng_Unadj', 'ReadEng_AgeAdj', 'PicVocab_Unadj', 'PicVocab_AgeAdj', 'ProcSpeed_Unadj', 'ProcSpeed_AgeAdj', 'ListSort_Unadj', 'ListSort_AgeAdj', 'CogFluidComp_Unadj', 'CogFluidComp_AgeAdj', 'CogEarlyComp_Unadj', 'CogEarlyComp_AgeAdj', 'CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
-#Notes: 
-# The fluid cognition composite: Dimensional Change Card Sort, Flanker, Picture Sequence Memory, List Sorting and Pattern Comparison. 
-# The crystalized cognition composite: Picture Vocabulary Test and the Oral Reading Recognition Test. 
 
 
 main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol','PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7','CogFluidComp_Unadj','CogFluidComp_AgeAdj','CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
@@ -91,11 +109,11 @@ TotPSQI_HippoL_linreg, TotPSQI_HippoL_X_train, TotPSQI_HippoL_X_test, TotPSQI_Hi
     df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 
 
-TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runLinReg(
+TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runLinRegLasso(
     df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
 
 
-CompPSQI_HippoL_linreg, CompPSQI_HippoL_X_train, CompPSQI_HippoL_X_test, CompPSQI_HippoL_y_train, CompPSQI_HippoL_y_test, CompPSQI_HippoL_actualvspred, CompPSQI_HippoL_train_results= runLinReg(
+CompPSQI_HippoL_linreg, CompPSQI_HippoL_X_train, CompPSQI_HippoL_X_test, CompPSQI_HippoL_y_train, CompPSQI_HippoL_y_test, CompPSQI_HippoL_actualvspred, CompPSQI_HippoL_train_results= runLinRegLasso(
     df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
 print(CompPSQI_HippoL_train_results)
 
@@ -104,6 +122,134 @@ CompPSQI_HippoR_linreg, CompPSQI_HippoR_X_train, CompPSQI_HippoR_X_test, CompPSQ
 
 
 
+
+#Rachel's Dec 3 Junk below here
+
+
+
+    
+
+#from plotly.offline import plot
+import matplotlib.cm as cm
+import seaborn as sns
+import pandas as pd
+from plotly.offline import plot
+import plotly.graph_objs as go
+from statsmodels.graphics.api import abline_plot
+import statsmodels.robust.norms as rnorms
+
+
+def graphmodel(model, X, y):
+    plt.scatter(X, y,color='g')
+    plt.plot(X, model.predict(X),color='k')
+
+    plt.show()
+    
+def ScatterPlotwRegLine(df,xvar,yvar,figuresize=(8, 8),dotcolorname='dodgerblue',linecolorname='mediumblue',savefigure=False):
+    columns = [xvar,yvar]
+    df2 = df.loc[:, columns] 
+    df2 = df2.dropna()
+    x = df2[xvar] ## X usually means our input variables (or independent variables)
+    y = df2[yvar]
+    fig, ax = plt.subplots(figsize=figuresize)
+    ax.scatter(x, y, alpha=0.5, color=dotcolorname)
+    #x = sm.add_constant(x) # constant intercept term
+    #model = sm.OLS(y, x, hasconst=True)
+    #fitted = model.fit()
+    #xminmax = np.linspace(x.min(), x.max(), 2)
+    #y_pred = fitted.predict(xminmax)
+    #ax.plot([x[xvar].min(),x[xvar].max()], y_pred, '-', color=linecolorname, linewidth=2)
+    ax.set_xlabel(xvar)
+    ax.set_ylabel(yvar)
+    if savefigure != False:
+        fig.savefig(savefigure)
+
+import os
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import os
+#from plotly.offline import plot
+import matplotlib.cm as cm
+import seaborn as sns
+import pandas as pd
+from plotly.offline import plot
+import plotly.graph_objs as go
+from statsmodels.graphics.api import abline_plot
+import statsmodels.robust.norms as rnorms
+
+from statsmodels.compat.python import lrange, lzip
+#from statsmodels.compat.pandas import Appender
+
+import numpy as np
+import pandas as pd
+from patsy import dmatrix
+
+from statsmodels.regression.linear_model import OLS, GLS, WLS
+from statsmodels.genmod.generalized_linear_model import GLM
+from statsmodels.genmod.generalized_estimating_equations import GEE
+from statsmodels.sandbox.regression.predstd import wls_prediction_std
+from statsmodels.graphics import utils
+from statsmodels.nonparametric.smoothers_lowess import lowess
+from statsmodels.tools.tools import maybe_unwrap_results
+
+
+def ScatterPlotwRegLine(df,xvar,yvar,figuresize=(8, 8),dotcolorname='dodgerblue',linecolorname='mediumblue',savefigure=False):
+    columns = [xvar,yvar]
+    df2 = df.loc[:, columns] 
+    df2 = df2.dropna()
+    x = df2[xvar] ## X usually means our input variables (or independent variables)
+    y = df2[yvar]
+    fig, ax = plt.subplots(figsize=figuresize)
+    ax.scatter(x, y, alpha=0.5, color=dotcolorname)
+    x = sm.add_constant(x) # constant intercept term
+    model = sm.OLS(y, x, hasconst=True)
+    fitted = model.fit()
+    xminmax = np.linspace(x.min(), x.max(), 2)
+    y_pred = fitted.predict(xminmax)
+    ax.plot([x[xvar].min(),x[xvar].max()], y_pred, '-', color=linecolorname, linewidth=2)
+    ax.set_xlabel(xvar)
+    ax.set_ylabel(yvar)
+    if savefigure != False:
+        fig.savefig(savefigure)
+
+def ScatterPlotwGLMLineModel(df,xvar,yvar,othervar,figuresize=(8, 8),dotcolorname='dodgerblue',linecolorname='mediumblue',savefigure=False):
+    columns = [xvar,yvar]+othervar
+    df2 = df.loc[:, columns] 
+    df2 = df2.dropna()    
+    #creates hours after midnight linear model and finds residuals, then identifies responder/non-responder    
+    x = df2[[xvar]+othervar] ## X usually means our input variables (or independent variables)
+    y = df2[yvar]   
+    x = sm.add_constant(x) # constant intercept term     
+    model = sm.GLM(y, x).fit()
+    ypred = model.predict(x)
+    ypred.name = yvar + 'Resid'
+    fig, ax = plt.subplots(figsize=figuresize)
+    ax.scatter(x[xvar], ypred, alpha=0.5, color=dotcolorname)
+    #xminmax = np.linspace(x[xvar].min(), x[xvar].max(), 2)
+    #yline = model.predict(xminmax)
+    #ax.plot([x[xvar].min(),x[xvar].max()], yline, '-', color=linecolorname, linewidth=2)
+    #abline_plot(model_results=model, ax=ax)
+    fig = abline_plot(0, model.params[0], color='k', ax=ax)
+    ax.set_xlabel(xvar)
+    ax.set_ylabel(ypred.name)
+    if savefigure != False:
+        fig.savefig(savefigure)    
+
+#PLOTS AREN"T WORKING
+df2 = normalize_df(df.drop(['Age'], axis=1))
+
+ScatterPlotwGLMLineModel(df2,'PSQI_Comp1','FS_L_Hippo_Vol',control_vars)
+ScatterPlotwGLMLineModel(df2,'PSQI_Score','FS_L_Hippo_Vol',control_vars)
+
+
+
+
+
+
+#ADAPTED CODE BELOW
 
 
 # #Code adapted from from trymanual and https://scikit-learn.org/stable/auto_examples/release_highlights/plot_release_highlights_0_23_0.html#sphx-glr-auto-examples-release-highlights-plot-release-highlights-0-23-0-py
@@ -142,3 +288,14 @@ CompPSQI_HippoR_linreg, CompPSQI_HippoR_X_train, CompPSQI_HippoR_X_test, CompPSQ
 # model = linear_model.Ridge()
 # model.fit(X, y)
 # model.coef_
+
+
+
+#ignore this but don't delete - just lists of variabls in case I want to go back and add in
+#brain_vars = ['FS_L_Hippo_Vol', 'FS_L_Amygdala_Vol', 'FS_L_AccumbensArea_Vol', 'FS_R_Hippo_Vol', 'FS_R_Amygdala_Vol', 'FS_R_AccumbensArea_Vol']
+#main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol']
+#all_PSQI_vars =['PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7', 'PSQI_BedTime', 'PSQI_Min2Asleep', 'PSQI_GetUpTime', 'PSQI_AmtSleep', 'PSQI_Latency30Min', 'PSQI_WakeUp', 'PSQI_Bathroom', 'PSQI_Breathe', 'PSQI_Snore', 'PSQI_TooCold', 'PSQI_TooHot', 'PSQI_BadDream', 'PSQI_Pain', 'PSQI_Other', 'PSQI_Quality', 'PSQI_SleepMeds', 'PSQI_DayStayAwake', 'PSQI_DayEnthusiasm', 'PSQI_BedPtnrRmate']
+#all_NIH_CogBat_vars = ['PicSeq_Unadj', 'PicSeq_AgeAdj', 'CardSort_Unadj', 'CardSort_AgeAdj', 'Flanker_Unadj', 'Flanker_AgeAdj', 'ReadEng_Unadj', 'ReadEng_AgeAdj', 'PicVocab_Unadj', 'PicVocab_AgeAdj', 'ProcSpeed_Unadj', 'ProcSpeed_AgeAdj', 'ListSort_Unadj', 'ListSort_AgeAdj', 'CogFluidComp_Unadj', 'CogFluidComp_AgeAdj', 'CogEarlyComp_Unadj', 'CogEarlyComp_AgeAdj', 'CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
+#Notes: 
+# The fluid cognition composite: Dimensional Change Card Sort, Flanker, Picture Sequence Memory, List Sorting and Pattern Comparison. 
+# The crystalized cognition composite: Picture Vocabulary Test and the Oral Reading Recognition Test. 
