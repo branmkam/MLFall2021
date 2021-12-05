@@ -9,6 +9,11 @@ from sklearn.linear_model import LinearRegression, Lasso
 from sklearn import metrics
 import regressors
 from regressors import stats
+from numpy import arange
+from pandas import read_csv
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RepeatedKFold
+from sklearn.linear_model import Lasso
 
 #split data into features and predictor
 def splitdata(df, feat, predictors):   
@@ -81,15 +86,36 @@ def runLinRegLasso(df, feat, predictors, alpha=1):
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 
+#adapted from https://machinelearningmastery.com/lasso-regression-with-python/
+def optimizeLasso(df, feat, predictors):
+    # define model
+    X, y = splitdata_normalize(df, feat, predictors)
+
+    model = Lasso()
+    # define model evaluation method
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # define grid
+    grid = dict()
+    grid['alpha'] = arange(0, 1, 0.01)
+    # define search
+    search = GridSearchCV(model, grid, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1)
+    # perform the search
+    results = search.fit(X, y)
+    # summarize
+    print('MAE: %.3f' % results.best_score_)
+    print('Config: %s' % results.best_params_)
 
 #Rachel's code December 1st
 
 #import data
 df_all = pd.read_excel('CondensedDataandKey.xlsx',sheet_name='data')
 
+AllCogAge = ['PicSeq_AgeAdj', 'CardSort_AgeAdj', 'Flanker_AgeAdj', 'ReadEng_AgeAdj', 'PicVocab_AgeAdj', 'ProcSpeed_AgeAdj', 'ListSort_AgeAdj']
+AllCogUnadj = ['PicSeq_Unadj', 'CardSort_Unadj',	'Flanker_Unadj', 'ReadEng_Unadj',	'PicVocab_Unadj', 'ProcSpeed_Unadj', 'ListSort_Unadj']
 
 main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol','PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7','CogFluidComp_Unadj','CogFluidComp_AgeAdj','CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
-df = df_all[main_vars]
+
+df = df_all[(main_vars+AllCogAge+AllCogUnadj)]
 df = df.dropna()
 
 #data cleanup
@@ -109,19 +135,83 @@ TotPSQI_HippoL_linreg, TotPSQI_HippoL_X_train, TotPSQI_HippoL_X_test, TotPSQI_Hi
     df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 
 
-TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runLinRegLasso(
+TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runLinReg(
     df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
 
 
-CompPSQI_HippoL_linreg, CompPSQI_HippoL_X_train, CompPSQI_HippoL_X_test, CompPSQI_HippoL_y_train, CompPSQI_HippoL_y_test, CompPSQI_HippoL_actualvspred, CompPSQI_HippoL_train_results= runLinRegLasso(
+CompPSQI_HippoL_linreg, CompPSQI_HippoL_X_train, CompPSQI_HippoL_X_test, CompPSQI_HippoL_y_train, CompPSQI_HippoL_y_test, CompPSQI_HippoL_actualvspred, CompPSQI_HippoL_train_results= runLinReg(
     df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
 print(CompPSQI_HippoL_train_results)
 
 CompPSQI_HippoR_linreg, CompPSQI_HippoR_X_train, CompPSQI_HippoR_X_test, CompPSQI_HippoR_y_train, CompPSQI_HippoR_y_test, CompPSQI_HippoR_actualvspred, CompPSQI_HippoR_train_results= runLinReg(
     df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
+print(CompPSQI_HippoR_train_results)
+
+
+optimizeLasso(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
+
+≈optimizeLasso(df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
+
+optimizeLasso(df, 'PSQI_Score', pred_PSQI_comp_vars)
+
+
+optimizeLasso(df, 'CogFluidComp_AgeAdj', ['Gender', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] )
+optimizeLasso(df, 'CogTotalComp_AgeAdj', ['Gender', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'])
+optimizeLasso(df, 'CogCrystalComp_AgeAdj', ['Gender', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'])
+
+
+FluidCompAge_HippoL_linreg, FluidCompAge_HippoL_X_train, FluidCompAge_HippoL_X_test, FluidCompAge_HippoL_y_train, FluidCompAge_HippoL_y_test, FluidCompAge_HippoL_actualvspred, FluidCompAge_HippoL_train_results= runLinReg(
+    df, 'FS_L_Hippo_Vol', ['Gender','CogFluidComp_AgeAdj','FS_IntraCranial_Vol'])
+print(FluidCompAge_HippoL_train_results)
+
+TotCompAge_HippoL_linreg, TotCompAge_HippoL_X_train, TotCompAge_HippoL_X_test, TotCompAge_HippoL_y_train, TotCompAge_HippoL_y_test, TotCompAge_HippoL_actualvspred, TotCompAge_HippoL_train_results= runLinReg(
+    df, 'FS_L_Hippo_Vol', ['Gender','CogTotalComp_AgeAdj','FS_IntraCranial_Vol'])
+print(TotCompAge_HippoL_train_results)
+
+CrystalCompAge_HippoL_linreg, CrystalCompAge_HippoL_X_train, CrystalCompAge_HippoL_X_test, CrystalCompAge_HippoL_y_train, CrystalCompAge_HippoL_y_test, CrystalCompAge_HippoL_actualvspred, CrystalCompAge_HippoL_train_results= runLinReg(
+    df, 'FS_L_Hippo_Vol', ['Gender','CogCrystalComp_AgeAdj','FS_IntraCranial_Vol'])
+print(CrystalCompAge_HippoL_train_results)
+
+FluidCompAge_HippoR_linreg, FluidCompAge_HippoR_X_train, FluidCompAge_HippoR_X_test, FluidCompAge_HippoR_y_train, FluidCompAge_HippoR_y_test, FluidCompAge_HippoR_actualvspred, FluidCompAge_HippoR_train_results= runLinReg(
+    df, 'FS_R_Hippo_Vol', ['Gender','CogFluidComp_AgeAdj','FS_IntraCranial_Vol'])
+print(FluidCompAge_HippoR_train_results)
+
+TotCompAge_HippoR_linreg, TotCompAge_HippoR_X_train, TotCompAge_HippoR_X_test, TotCompAge_HippoR_y_train, TotCompAge_HippoR_y_test, TotCompAge_HippoR_actualvspred, TotCompAge_HippoR_train_results= runLinReg(
+    df, 'FS_R_Hippo_Vol', ['Gender','CogTotalComp_AgeAdj','FS_IntraCranial_Vol'])
+print(TotCompAge_HippoR_train_results)
+
+CrystalCompAge_HippoR_linreg, CrystalCompAge_HippoR_X_train, CrystalCompAge_HippoR_X_test, CrystalCompAge_HippoR_y_train, CrystalCompAge_HippoR_y_test, CrystalCompAge_HippoR_actualvspred, CrystalCompAge_HippoR_train_results= runLinReg(
+    df, 'FS_R_Hippo_Vol', ['Gender','CogCrystalComp_AgeAdj','FS_IntraCranial_Vol'])
+print(CrystalCompAge_HippoR_train_results)
+
+
+AllCogAge = ['PicSeq_AgeAdj', 'CardSort_AgeAdj', 'Flanker_AgeAdj', 'ReadEng_AgeAdj', 'PicVocab_AgeAdj', 'ProcSpeed_AgeAdj', 'ListSort_AgeAdj']
+AllCogUnadj = ['PicSeq_Unadj', 'CardSort_Unadj',	'Flanker_Unadj', 'ReadEng_Unadj',	'PicVocab_Unadj', 'ProcSpeed_Unadj', 'ListSort_Unadj']
+
+AllCogAge_HippoL_linreg, AllCogAge_HippoL_X_train, AllCogAge_HippoL_X_test, AllCogAge_HippoL_y_train, AllCogAge_HippoL_y_test, AllCogAge_HippoL_actualvspred, AllCogAge_HippoL_train_results= runLinReg(
+    df, 'FS_L_Hippo_Vol', (['Gender','FS_IntraCranial_Vol']+AllCogAge))
+print(AllCogAge_HippoL_train_results)
+
+AllCogAge_HippoR_linreg, AllCogAge_HippoR_X_train, AllCogAge_HippoR_X_test, AllCogAge_HippoR_y_train, AllCogAge_HippoR_y_test, AllCogAge_HippoR_actualvspred, AllCogAge_HippoR_train_results= runLinReg(
+    df, 'FS_R_Hippo_Vol', (['Gender','FS_IntraCranial_Vol']+AllCogAge))
+print(AllCogAge_HippoR_train_results)
+
+optimizeLasso(df, 'FS_L_Hippo_Vol', (['Gender','FS_IntraCranial_Vol']+AllCogAge))
+optimizeLasso(df, 'FS_R_Hippo_Vol', (['Gender','FS_IntraCranial_Vol']+AllCogAge))
+
+optimizeLasso(df, 'FS_L_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
+optimizeLasso(df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
+
+
+Cog2Age_HippoL_linreg, Cog2Age_HippoL_X_train, Cog2Age_HippoL_X_test, Cog2Age_HippoL_y_train, Cog2Age_HippoL_y_test, Cog2Age_HippoL_actualvspred, Cog2Age_HippoL_train_results= runLinReg(
+    df, 'FS_L_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
+print(Cog2Age_HippoL_train_results)
 
 
 
+Cog2Age_HippoR_linreg, Cog2Age_HippoR_X_train, Cog2Age_HippoR_X_test, Cog2Age_HippoR_y_train, Cog2Age_HippoR_y_test, Cog2Age_HippoR_actualvspred, Cog2Age_HippoR_train_results= runLinReg(
+    df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
+print(Cog2Age_HippoR_train_results)
 
 #Rachel's Dec 3 Junk below here
 
