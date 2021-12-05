@@ -215,7 +215,7 @@ df['AgeCat'] = df['Age'].replace(age_dict)
 control_vars = ['Gender','AgeCat','FS_IntraCranial_Vol']
 
 #Total PSQI and controls
-pred_PSQI_tot_vars = ['PSQI_Score'] + control_vars
+pred_PSQI_tot_vars = ['PSQI_Score', 'Gender','AgeCat','FS_IntraCranial_Vol']
 
 #PSQI Component subscores (7) 
 pred_PSQI_comp_vars = ['PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars
@@ -322,7 +322,8 @@ Cog2Age_HippoR_linreg, Cog2Age_HippoR_X_train, Cog2Age_HippoR_X_test, Cog2Age_Hi
 print(Cog2Age_HippoR_train_results)
 
 
-X, y = splitdata_normalize( df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
+X, y = splitdata_normalize(df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     
 n_alphas = 200
