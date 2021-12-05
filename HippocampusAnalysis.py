@@ -64,14 +64,14 @@ def runLinReg(df, feat, predictors):
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 
-def runRidgeCVReg(df, feat, predictors, alphaval=1):
+def runRidgeCVReg(df, feat, predictors):
     X, y = splitdata_normalize(df, feat, predictors)
 
     # Code from try1
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
 
-    linreg = RidgeCV(fit_intercept=True, alpha=alphaval)
+    linreg = RidgeCV(fit_intercept=True)
     linreg.fit(X_train, y_train)
     train_results = getcoeffandpvals(linreg, X_train, y_train)
     
@@ -276,27 +276,27 @@ CompPSQI_HippoR_linreg, CompPSQI_HippoR_X_train, CompPSQI_HippoR_X_test, CompPSQ
 #optimizeLasso(df, 'CogCrystalComp_AgeAdj', ['Gender', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'])
 
 
-FluidCompAge_HippoL_linreg, FluidCompAge_HippoL_X_train, FluidCompAge_HippoL_X_test, FluidCompAge_HippoL_y_train, FluidCompAge_HippoL_y_test, FluidCompAge_HippoL_actualvspred, FluidCompAge_HippoL_train_results= runRidgeCVReg(
+FluidCompAge_HippoL_linreg, FluidCompAge_HippoL_X_train, FluidCompAge_HippoL_X_test, FluidCompAge_HippoL_y_train, FluidCompAge_HippoL_y_test, FluidCompAge_HippoL_actualvspred, FluidCompAge_HippoL_train_results= runRidgeReg(
     df, 'FS_L_Hippo_Vol', ['Gender','CogFluidComp_AgeAdj','FS_IntraCranial_Vol'])
 print(FluidCompAge_HippoL_train_results)
 
-TotCompAge_HippoL_linreg, TotCompAge_HippoL_X_train, TotCompAge_HippoL_X_test, TotCompAge_HippoL_y_train, TotCompAge_HippoL_y_test, TotCompAge_HippoL_actualvspred, TotCompAge_HippoL_train_results= runRidgeCVReg(
+TotCompAge_HippoL_linreg, TotCompAge_HippoL_X_train, TotCompAge_HippoL_X_test, TotCompAge_HippoL_y_train, TotCompAge_HippoL_y_test, TotCompAge_HippoL_actualvspred, TotCompAge_HippoL_train_results= runRidgeReg(
     df, 'FS_L_Hippo_Vol', ['Gender','CogTotalComp_AgeAdj','FS_IntraCranial_Vol'])
 print(TotCompAge_HippoL_train_results)
 
-CrystalCompAge_HippoL_linreg, CrystalCompAge_HippoL_X_train, CrystalCompAge_HippoL_X_test, CrystalCompAge_HippoL_y_train, CrystalCompAge_HippoL_y_test, CrystalCompAge_HippoL_actualvspred, CrystalCompAge_HippoL_train_results= runRidgeCVReg(
+CrystalCompAge_HippoL_linreg, CrystalCompAge_HippoL_X_train, CrystalCompAge_HippoL_X_test, CrystalCompAge_HippoL_y_train, CrystalCompAge_HippoL_y_test, CrystalCompAge_HippoL_actualvspred, CrystalCompAge_HippoL_train_results= runRidgeReg(
     df, 'FS_L_Hippo_Vol', ['Gender','CogCrystalComp_AgeAdj','FS_IntraCranial_Vol'])
 print(CrystalCompAge_HippoL_train_results)
 
-FluidCompAge_HippoR_linreg, FluidCompAge_HippoR_X_train, FluidCompAge_HippoR_X_test, FluidCompAge_HippoR_y_train, FluidCompAge_HippoR_y_test, FluidCompAge_HippoR_actualvspred, FluidCompAge_HippoR_train_results= runRidgeCVReg(
+FluidCompAge_HippoR_linreg, FluidCompAge_HippoR_X_train, FluidCompAge_HippoR_X_test, FluidCompAge_HippoR_y_train, FluidCompAge_HippoR_y_test, FluidCompAge_HippoR_actualvspred, FluidCompAge_HippoR_train_results= runRidgeReg(
     df, 'FS_R_Hippo_Vol', ['Gender','CogFluidComp_AgeAdj','FS_IntraCranial_Vol'])
 print(FluidCompAge_HippoR_train_results)
 
-TotCompAge_HippoR_linreg, TotCompAge_HippoR_X_train, TotCompAge_HippoR_X_test, TotCompAge_HippoR_y_train, TotCompAge_HippoR_y_test, TotCompAge_HippoR_actualvspred, TotCompAge_HippoR_train_results= runRidgeCVReg(
+TotCompAge_HippoR_linreg, TotCompAge_HippoR_X_train, TotCompAge_HippoR_X_test, TotCompAge_HippoR_y_train, TotCompAge_HippoR_y_test, TotCompAge_HippoR_actualvspred, TotCompAge_HippoR_train_results= runRidgeReg(
     df, 'FS_R_Hippo_Vol', ['Gender','CogTotalComp_AgeAdj','FS_IntraCranial_Vol'])
 print(TotCompAge_HippoR_train_results)
 
-CrystalCompAge_HippoR_linreg, CrystalCompAge_HippoR_X_train, CrystalCompAge_HippoR_X_test, CrystalCompAge_HippoR_y_train, CrystalCompAge_HippoR_y_test, CrystalCompAge_HippoR_actualvspred, CrystalCompAge_HippoR_train_results= runRidgeCVReg(
+CrystalCompAge_HippoR_linreg, CrystalCompAge_HippoR_X_train, CrystalCompAge_HippoR_X_test, CrystalCompAge_HippoR_y_train, CrystalCompAge_HippoR_y_test, CrystalCompAge_HippoR_actualvspred, CrystalCompAge_HippoR_train_results= runRidgeReg(
     df, 'FS_R_Hippo_Vol', ['Gender','CogCrystalComp_AgeAdj','FS_IntraCranial_Vol'])
 print(CrystalCompAge_HippoR_train_results)
 
@@ -317,7 +317,7 @@ print(Cog2Age_HippoL_train_results)
 
 
 
-Cog2Age_HippoR_linreg, Cog2Age_HippoR_X_train, Cog2Age_HippoR_X_test, Cog2Age_HippoR_y_train, Cog2Age_HippoR_y_test, Cog2Age_HippoR_actualvspred, Cog2Age_HippoR_train_results= runRidgeCVReg(
+Cog2Age_HippoR_linreg, Cog2Age_HippoR_X_train, Cog2Age_HippoR_X_test, Cog2Age_HippoR_y_train, Cog2Age_HippoR_y_test, Cog2Age_HippoR_actualvspred, Cog2Age_HippoR_train_results= runRidgeReg(
     df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
 print(Cog2Age_HippoR_train_results)
 
