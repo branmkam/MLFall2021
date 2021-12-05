@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import time
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.linear_model import LinearRegression, Lasso, Ridge, RidgeCV
 from sklearn import metrics
 import regressors
 from regressors import stats
@@ -64,6 +64,26 @@ def runLinReg(df, feat, predictors):
     
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
+
+def runRidgeCVReg(df, feat, predictors):
+    X, y = splitdata_normalize(df, feat, predictors)
+
+    # Code from try1
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
+
+    linreg = RidgeCV(fit_intercept=True)
+    linreg.fit(X_train, y_train)
+    train_results = getcoeffandpvals(linreg, X_train, y_train)
+    
+    y_pred = linreg.predict(X_test)
+    actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
+    print(actualvspred.sort_values(by='Difference', ascending=False))
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    
+    return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 def runLinRegLasso(df, feat, predictors, alpha=1):
     X, y = splitdata_normalize(df, feat, predictors)
@@ -150,7 +170,7 @@ print(CompPSQI_HippoR_train_results)
 
 optimizeLasso(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 
-≈optimizeLasso(df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
+optimizeLasso(df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
 
 optimizeLasso(df, 'PSQI_Score', pred_PSQI_comp_vars)
 
