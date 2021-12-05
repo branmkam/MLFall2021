@@ -144,15 +144,11 @@ def optimizeLasso(df, feat, predictors):
 #import data
 df_all = pd.read_excel('CondensedDataandKey.xlsx',sheet_name='data')
 
-#all cognitive variables
-
-AllCogAge = ['PicSeq_AgeAdj', 'CardSort_AgeAdj', 'Flanker_AgeAdj', 'ReadEng_AgeAdj', 'PicVocab_AgeAdj', 'ProcSpeed_AgeAdj', 'ListSort_AgeAdj']
-AllCogUnadj = ['PicSeq_Unadj', 'CardSort_Unadj',	'Flanker_Unadj', 'ReadEng_Unadj',	'PicVocab_Unadj', 'ProcSpeed_Unadj', 'ListSort_Unadj']
 
 #all sleep/brain variables
 main_vars = ['Subject', 'Gender', 'Age', 'FS_IntraCranial_Vol', 'FS_L_Hippo_Vol', 'FS_R_Hippo_Vol','PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7','CogFluidComp_Unadj','CogFluidComp_AgeAdj','CogTotalComp_Unadj', 'CogTotalComp_AgeAdj', 'CogCrystalComp_Unadj', 'CogCrystalComp_AgeAdj']
 
-df = df_all[(main_vars+AllCogAge+AllCogUnadj)]
+df = df_all[main_vars]
 df = df.dropna()
 
 #data cleanup
@@ -237,17 +233,6 @@ CrystalCompAge_HippoR_linreg, CrystalCompAge_HippoR_X_train, CrystalCompAge_Hipp
     df, 'FS_R_Hippo_Vol', ['Gender','CogCrystalComp_AgeAdj','FS_IntraCranial_Vol'])
 print(CrystalCompAge_HippoR_train_results)
 
-
-AllCogAge = ['PicSeq_AgeAdj', 'CardSort_AgeAdj', 'Flanker_AgeAdj', 'ReadEng_AgeAdj', 'PicVocab_AgeAdj', 'ProcSpeed_AgeAdj', 'ListSort_AgeAdj']
-AllCogUnadj = ['PicSeq_Unadj', 'CardSort_Unadj',	'Flanker_Unadj', 'ReadEng_Unadj',	'PicVocab_Unadj', 'ProcSpeed_Unadj', 'ListSort_Unadj']
-
-AllCogAge_HippoL_linreg, AllCogAge_HippoL_X_train, AllCogAge_HippoL_X_test, AllCogAge_HippoL_y_train, AllCogAge_HippoL_y_test, AllCogAge_HippoL_actualvspred, AllCogAge_HippoL_train_results= runRidgeCVReg(
-    df, 'FS_L_Hippo_Vol', (['Gender','FS_IntraCranial_Vol']+AllCogAge))
-print(AllCogAge_HippoL_train_results)
-
-AllCogAge_HippoR_linreg, AllCogAge_HippoR_X_train, AllCogAge_HippoR_X_test, AllCogAge_HippoR_y_train, AllCogAge_HippoR_y_test, AllCogAge_HippoR_actualvspred, AllCogAge_HippoR_train_results= runRidgeCVReg(
-    df, 'FS_R_Hippo_Vol', (['Gender','FS_IntraCranial_Vol']+AllCogAge))
-print(AllCogAge_HippoR_train_results)
 
 
 
