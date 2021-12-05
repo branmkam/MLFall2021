@@ -64,14 +64,14 @@ def runLinReg(df, feat, predictors):
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 
-def runRidgeCVReg(df, feat, predictors, alpha=1):
+def runRidgeCVReg(df, feat, predictors, alphaval=1):
     X, y = splitdata_normalize(df, feat, predictors)
 
     # Code from try1
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
 
-    linreg = RidgeCV(fit_intercept=True, alpha=alpha)
+    linreg = RidgeCV(fit_intercept=True, alpha=alphaval)
     linreg.fit(X_train, y_train)
     train_results = getcoeffandpvals(linreg, X_train, y_train)
     
@@ -84,6 +84,26 @@ def runRidgeCVReg(df, feat, predictors, alpha=1):
     
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
+
+def runRidgeReg(df, feat, predictors, alpha=1):
+    X, y = splitdata_normalize(df, feat, predictors)
+
+    # Code from try1
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
+
+    linreg = Ridge(fit_intercept=True, alpha=alpha)
+    linreg.fit(X_train, y_train)
+    train_results = getcoeffandpvals(linreg, X_train, y_train)
+    
+    y_pred = linreg.predict(X_test)
+    actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
+    print(actualvspred.sort_values(by='Difference', ascending=False))
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    
+    return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 
 #adapted from https://machinelearningmastery.com/ridge-regression-with-python/
@@ -174,17 +194,19 @@ pred_PSQI_comp_vars = ['PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', '
 #optimizing Lasso predicting left/right hippocampus volume using the total PSQI or PSQI component scores- didn't work
 #optimizeLasso(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 #optimizeLasso(df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
-
 #optimizeLasso(df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
 #optimizeLasso(df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
-
 #optimizeLasso(df, 'PSQI_Score', pred_PSQI_comp_vars)
 
 
 
+
+#predicting left hipopocampus
+#optimizeRidge(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
+#get alpha = 0.13
 #Ridge Regression
-TotPSQI_HippoL_linreg, TotPSQI_HippoL_X_train, TotPSQI_HippoL_X_test, TotPSQI_HippoL_y_train, TotPSQI_HippoL_y_test, TotPSQI_HippoL_actualvspred, TotPSQI_HippoL_train_results= runRidgeCVReg(
-    df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
+TotPSQI_HippoL_linreg, TotPSQI_HippoL_X_train, TotPSQI_HippoL_X_test, TotPSQI_HippoL_y_train, TotPSQI_HippoL_y_test, TotPSQI_HippoL_actualvspred, TotPSQI_HippoL_train_results= runRidgeReg(
+    df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars, alpha=0.13)
 
 
 TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runRidgeCVReg(
