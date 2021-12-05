@@ -65,14 +65,14 @@ def runLinReg(df, feat, predictors):
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 
-def runRidgeCVReg(df, feat, predictors):
+def runRidgeCVReg(df, feat, predictors, alpha=1):
     X, y = splitdata_normalize(df, feat, predictors)
 
     # Code from try1
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
 
-    linreg = RidgeCV(fit_intercept=True)
+    linreg = RidgeCV(fit_intercept=True, alpha=alpha)
     linreg.fit(X_train, y_train)
     train_results = getcoeffandpvals(linreg, X_train, y_train)
     
@@ -84,6 +84,22 @@ def runRidgeCVReg(df, feat, predictors):
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
     
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
+
+
+
+#adapted from https://machinelearningmastery.com/ridge-regression-with-python/
+def optimizeRidge(df, feat, predictors):
+    # define model
+    X, y = splitdata_normalize(df, feat, predictors)
+    # define model evaluation method
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # define model
+    model = RidgeCV(alphas=arange(0, 1, 0.01), cv=cv, scoring='neg_mean_absolute_error')
+    # fit model
+    model.fit(X, y)
+    # summarize chosen configuration
+    print('alpha: %f' % model.alpha_)
+
 
 def runLinRegLasso(df, feat, predictors, alpha=1):
     X, y = splitdata_normalize(df, feat, predictors)
