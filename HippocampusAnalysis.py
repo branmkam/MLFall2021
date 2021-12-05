@@ -321,3 +321,33 @@ Cog2Age_HippoR_linreg, Cog2Age_HippoR_X_train, Cog2Age_HippoR_X_test, Cog2Age_Hi
     df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
 print(Cog2Age_HippoR_train_results)
 
+
+X, y = splitdata_normalize( df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    
+n_alphas = 200
+alphas = np.logspace(-10, -2, n_alphas)
+
+coefs = []
+for a in alphas:
+    ridge = Ridge(alpha=a, fit_intercept=False)
+    ridge.fit(X, y)
+    coefs.append(ridge.coef_)
+
+# #############################################################################
+# Display results
+
+ax = plt.gca()
+
+ax.plot(alphas, coefs)
+ax.set_xscale("log")
+ax.set_xlim(ax.get_xlim()[::-1])  # reverse axis
+plt.xlabel("alpha")
+plt.ylabel("weights")
+plt.title("Ridge coefficients as a function of the regularization")
+plt.axis("tight")
+plt.show()
+
+
+
+
