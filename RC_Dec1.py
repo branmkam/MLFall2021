@@ -223,13 +223,13 @@ optimizeLasso(df, 'FS_L_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidCom
 optimizeLasso(df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
 
 
-Cog2Age_HippoL_linreg, Cog2Age_HippoL_X_train, Cog2Age_HippoL_X_test, Cog2Age_HippoL_y_train, Cog2Age_HippoL_y_test, Cog2Age_HippoL_actualvspred, Cog2Age_HippoL_train_results= runLinReg(
+Cog2Age_HippoL_linreg, Cog2Age_HippoL_X_train, Cog2Age_HippoL_X_test, Cog2Age_HippoL_y_train, Cog2Age_HippoL_y_test, Cog2Age_HippoL_actualvspred, Cog2Age_HippoL_train_results= runRidgeCVReg(
     df, 'FS_L_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
 print(Cog2Age_HippoL_train_results)
 
 
 
-Cog2Age_HippoR_linreg, Cog2Age_HippoR_X_train, Cog2Age_HippoR_X_test, Cog2Age_HippoR_y_train, Cog2Age_HippoR_y_test, Cog2Age_HippoR_actualvspred, Cog2Age_HippoR_train_results= runLinReg(
+Cog2Age_HippoR_linreg, Cog2Age_HippoR_X_train, Cog2Age_HippoR_X_test, Cog2Age_HippoR_y_train, Cog2Age_HippoR_y_test, Cog2Age_HippoR_actualvspred, Cog2Age_HippoR_train_results= runRidgeCVReg(
     df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
 print(Cog2Age_HippoR_train_results)
 
