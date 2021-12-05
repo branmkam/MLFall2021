@@ -106,6 +106,7 @@ def runRidgeReg(df, feat, predictors, alpha=1):
     return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
 
 
+
 #adapted from https://machinelearningmastery.com/ridge-regression-with-python/
 def optimizeRidge(df, feat, predictors):
     # define model
@@ -118,8 +119,39 @@ def optimizeRidge(df, feat, predictors):
     model.fit(X, y)
     # summarize chosen configuration
     print('alpha: %f' % model.alpha_)
+    
+    
+
+#adapted from https://machinelearningmastery.com/ridge-regression-with-python/
+def optimizeRidgeFull(df, feat, predictors):
+    # define model
+    X, y = splitdata_normalize(df, feat, predictors)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5)
+
+    # define model evaluation method
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # define model
+    linreg = RidgeCV(alphas=arange(0, 1, 0.01), cv=cv, scoring='neg_mean_absolute_error')
+    # fit model
+    linreg.fit(X_train, y_train)
+    # summarize chosen configuration
+    opt_alpha = linreg.alpha_
+    train_results = getcoeffandpvals(linreg, X_train, y_train)
+
+    y_pred = linreg.predict(X_test)
+    actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
+    print(actualvspred.sort_values(by='Difference', ascending=False))
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    print('alpha: %f' % opt_alpha)
+    
+    return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results, opt_alpha
 
 
+
+    
+    
 def runLinRegLasso(df, feat, predictors, alpha=1):
     X, y = splitdata_normalize(df, feat, predictors)
 
@@ -201,25 +233,38 @@ pred_PSQI_comp_vars = ['PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', '
 
 
 
-#predicting left hipopocampus
+#predicting left hipopocampus volume using total PSQI (and gender/age/ICV)
 #optimizeRidge(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 #get alpha = 0.13
 #Ridge Regression
 TotPSQI_HippoL_linreg, TotPSQI_HippoL_X_train, TotPSQI_HippoL_X_test, TotPSQI_HippoL_y_train, TotPSQI_HippoL_y_test, TotPSQI_HippoL_actualvspred, TotPSQI_HippoL_train_results= runRidgeReg(
     df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars, alpha=0.13)
+#print(TotPSQI_HippoL_train_results)
+
+#predicting right hipopocampus volume using total PSQI (and gender/age/ICV)
+#optimizeRidge(df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
+#get alpha = 0.09
+#Ridge Regression
+TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runRidgeReg(
+    df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars, alpha=0.09)
+#print(TotPSQI_HippoR_train_results)
 
 
-TotPSQI_HippoR_linreg, TotPSQI_HippoR_X_train, TotPSQI_HippoR_X_test, TotPSQI_HippoR_y_train, TotPSQI_HippoR_y_test, TotPSQI_HippoR_actualvspred, TotPSQI_HippoR_train_results= runRidgeCVReg(
-    df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
+#predicting left hipopocampus volume using 7 PSQI comp scores (and gender/age/ICV)
+#optimizeRidge(df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
+#get alpha = 0.49
+#Ridge Regression
+CompPSQI_HippoL_linreg, CompPSQI_HippoL_X_train, CompPSQI_HippoL_X_test, CompPSQI_HippoL_y_train, CompPSQI_HippoL_y_test, CompPSQI_HippoL_actualvspred, CompPSQI_HippoL_train_results= runRidgeReg(
+    df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars, alpha=0.49)
+#looks like Comp1 (subjective sleep quality) and Comp4 (sleep duration) were possibly decent predictors, but not great
 
 
-CompPSQI_HippoL_linreg, CompPSQI_HippoL_X_train, CompPSQI_HippoL_X_test, CompPSQI_HippoL_y_train, CompPSQI_HippoL_y_test, CompPSQI_HippoL_actualvspred, CompPSQI_HippoL_train_results= runRidgeCVReg(
-    df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
-print(CompPSQI_HippoL_train_results)
-
-CompPSQI_HippoR_linreg, CompPSQI_HippoR_X_train, CompPSQI_HippoR_X_test, CompPSQI_HippoR_y_train, CompPSQI_HippoR_y_test, CompPSQI_HippoR_actualvspred, CompPSQI_HippoR_train_results= runRidgeCVReg(
-    df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
-print(CompPSQI_HippoR_train_results)
+#predicting left hipopocampus volume using 7 PSQI comp scores (and gender/age/ICV)
+#optimizeRidge(df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars)
+#get alpha = 0.18
+CompPSQI_HippoR_linreg, CompPSQI_HippoR_X_train, CompPSQI_HippoR_X_test, CompPSQI_HippoR_y_train, CompPSQI_HippoR_y_test, CompPSQI_HippoR_actualvspred, CompPSQI_HippoR_train_results= runRidgeReg(
+    df, 'FS_R_Hippo_Vol', pred_PSQI_comp_vars, alpha=0.18)
+#print(CompPSQI_HippoR_train_results)
 
 
 
@@ -266,7 +311,7 @@ print(CrystalCompAge_HippoR_train_results)
 #optimizeLasso(df, 'FS_R_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
 
 
-Cog2Age_HippoL_linreg, Cog2Age_HippoL_X_train, Cog2Age_HippoL_X_test, Cog2Age_HippoL_y_train, Cog2Age_HippoL_y_test, Cog2Age_HippoL_actualvspred, Cog2Age_HippoL_train_results= runRidgeCVReg(
+Cog2Age_HippoL_linreg, Cog2Age_HippoL_X_train, Cog2Age_HippoL_X_test, Cog2Age_HippoL_y_train, Cog2Age_HippoL_y_test, Cog2Age_HippoL_actualvspred, Cog2Age_HippoL_train_results= optimizeRidgeFull(
     df, 'FS_L_Hippo_Vol', ['Gender','FS_IntraCranial_Vol','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'])
 print(Cog2Age_HippoL_train_results)
 
