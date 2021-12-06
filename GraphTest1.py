@@ -1,4 +1,4 @@
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, ElasticNet, Lasso
 #Importing libraries. The same will be used throughout the article.
 import numpy as np
 import pandas as pd
@@ -9,7 +9,7 @@ from matplotlib.pylab import rcParams
 rcParams['figure.figsize'] = 12, 10
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import sklearn.preprocessing
+import sklearn.preprocessing as preprocessing
 
 def ridge_regression(data, predictors, alpha, models_to_plot={}):
     #Fit the model
@@ -108,6 +108,7 @@ def splitdata_normalize(df, feat, predictors):
     #X_int = pd.DataFrame(np.concatenate( ( np.ones((X.shape[0], 1)), X), axis = 1 ), columns = ['intercept'] + predictors)
     return X, y
 
+# http://ethen8181.github.io/machine-learning/regularization/regularization.html
 
 features = pred_PSQI_comp_vars
 X, y = splitdata(df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
@@ -116,6 +117,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 1)
 std = StandardScaler()
 X_train_std = std.fit_transform(X_train)
 X_test_std = std.transform(X_test)
+
+X, y = splitdata_normalize(df, 'FS_L_Hippo_Vol', pred_PSQI_comp_vars)
+X_train_std, X_test, X_test_std, y_test = train_test_split(X, y, random_state = 1)
+
 
 # loop through different penalty score (alpha) and obtain the estimated coefficient (weights)
 alphas = 10 ** np.arange(1, 5)
