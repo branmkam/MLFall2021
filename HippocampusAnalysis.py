@@ -14,6 +14,9 @@ import regressors
 from regressors import stats
 from numpy import arange
 from pandas import read_csv
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+import sklearn.preprocessing as preprocessing
 
 from yellowbrick.regressor import ResidualsPlot
 
@@ -142,6 +145,38 @@ def optimizeRidgeFull(df, feat, predictors):
     train_results = getcoeffandpvals(linreg, X_train, y_train)
 
     y_pred = linreg.predict(X_test)
+    actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
+    print(actualvspred.sort_values(by='Difference', ascending=False))
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    print('alpha: %f' % opt_alpha)
+    
+    return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results, opt_alpha
+
+
+#same as above but larger alpha range  
+def optimizeRidgeFullLargerAlphaRange(df, feat, predictors):
+    # define model
+    X, y = splitdata_normalize(df, feat, predictors)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5)
+
+    std = StandardScaler()
+    X_train_std = pd.DataFrame(std.fit_transform(X_train), columns = X_train.columns)
+    X_test_std = pd.DataFrame(std.transform(X_test), columns = X_test.columns)
+
+    # define model evaluation method
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # define model
+    alphas = [1e-15, 1e-10, 1e-8] + list(arange(0.01, 1, 0.01)) + list(arange(1, 5, 0.2)) + list(arange(5, 40, 1))
+    linreg = RidgeCV(alphas=alphas, cv=cv, scoring='neg_mean_absolute_error')
+    # fit model
+    linreg.fit(X_train_std, y_train)
+    # summarize chosen configuration
+    opt_alpha = linreg.alpha_
+    train_results = getcoeffandpvals(linreg, X_train_std, y_train)
+
+    y_pred = linreg.predict(X_test_std)
     actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
     print(actualvspred.sort_values(by='Difference', ascending=False))
     print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
