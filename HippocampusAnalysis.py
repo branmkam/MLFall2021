@@ -15,6 +15,9 @@ from regressors import stats
 from numpy import arange
 from pandas import read_csv
 
+from yellowbrick.regressor import ResidualsPlot
+
+
 #split data into features and predictor
 def splitdata(df, feat, predictors):   
     y = df[feat]
@@ -349,6 +352,23 @@ plt.ylabel("weights")
 plt.title("Ridge coefficients as a function of the regularization")
 plt.axis("tight")
 plt.show()
+
+
+
+
+# #############################################################################
+
+
+model = Ridge()
+visualizer = ResidualsPlot(model, hist=False, qqplot=True)
+
+visualizer.fit(X_train, y_train)
+visualizer.score(X_test, y_test)
+visualizer.show()
+
+
+
+
 
 
 
