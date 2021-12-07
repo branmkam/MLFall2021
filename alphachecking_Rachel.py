@@ -12,6 +12,11 @@ from sklearn.model_selection import train_test_split
 from yellowbrick.regressor import ResidualsPlot,  AlphaSelection
 import matplotlib.pyplot as plt
 
+#split data into features and predictor
+def splitdata(df, feat, predictors):   
+    y = df[feat]
+    X = df[predictors]
+    return X, y
 
 #import data
 df_all = pd.read_excel('CondensedDataandKey.xlsx',sheet_name='data')
@@ -34,11 +39,19 @@ df['AgeCat'] = df['Age'].replace(age_dict)
 
 df['Bilat_Hippo_Vol'] = df['FS_L_Hippo_Vol'] + df['FS_R_Hippo_Vol']
 
+ICV, HippoVol = splitdata(df, 'FS_IntraCranial_Vol', 'Bilat_Hippo_Vol')
+ICV = pd.DataFrame(ICV)
+normlize_hippo = LinearRegression()
+normlize_hippo.fit(ICV, HippoVol)
+
+prediction = normlize_hippo.predict(ICV)
+df['Bilat_Hippo_normICV'] = (HippoVol - prediction)
+
 #variables we're controlling for
-control_vars = ['Gender','AgeCat','FS_IntraCranial_Vol']
+control_vars = ['Gender','AgeCat']
 
 #Total PSQI and controls
-pred_PSQI_tot_vars = ['PSQI_Score', 'Gender','AgeCat','FS_IntraCranial_Vol']
+pred_PSQI_tot_vars = ['PSQI_Score', 'Gender','AgeCat']
 
 #PSQI Component subscores (7) 
 pred_PSQI_comp_vars = ['PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars
@@ -46,7 +59,7 @@ pred_PSQI_comp_vars = ['PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', '
 pred_cog_vars = ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'] + control_vars
 
 def checkOptimalAlphaTrain(X_train, y_train, savefigure=False):
-    alphas = np.logspace(-10, 1, 400)
+    alphas = np.logspace(-10, 1.4, 400)
     
     # Instantiate the linear model and visualizer
     model = RidgeCV(alphas=alphas)
@@ -88,7 +101,6 @@ def runRidgeRegPresplit(df, X_train, X_test, y_train, y_test, alpha=1):
 
     return linreg, actualvspred, train_results
 
-
 #X, y = splitdata_normalize(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 #checkOptimalAlpha(X,y)
 #X,y = splitdata_normalize(df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
@@ -99,21 +111,21 @@ def runRidgeRegPresplit(df, X_train, X_test, y_train, y_test, alpha=1):
 #checkOptimalAlpha(X,y)
 
 
-X_1, y_1 = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_PSQI_tot_vars)
+X_1, y_1 = splitdata_normalize(df, 'Bilat_Hippo_normICV', pred_PSQI_tot_vars)
 X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1, y_1, test_size=0.25, random_state=None)
 alpha_1 = checkOptimalAlphaTrain(X_train_1, y_train_1, savefigure = 'alphaTotPSQI.png')
 TotPSQI_reg, TotPSQI_actualvspred, TotPSQI_train_results= runRidgeRegPresplit(
     df, X_train_1, X_test_1, y_train_1, y_test_1, alpha=alpha_1)
 
 
-X_2, y_2 = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_PSQI_comp_vars)
+X_2, y_2 = splitdata_normalize(df, 'Bilat_Hippo_normICV', pred_PSQI_comp_vars)
 X_train_2, X_test_2, y_train_2, y_test_2 = train_test_split(X_2, y_2, test_size=0.25, random_state=None)
 alpha_2 = checkOptimalAlphaTrain(X_train_2, y_train_2, savefigure = 'alphaCompPSQI.png')
 CompPSQI_reg, CompPSQI_actualvspred, CompPSQI_train_results= runRidgeRegPresplit(
     df, X_train_2, X_test_2, y_train_2, y_test_2, alpha=alpha_2)
 
 
-X_3, y_3 = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_cog_vars)
+X_3, y_3 = splitdata_normalize(df, 'Bilat_Hippo_normICV', pred_cog_vars)
 X_train_3, X_test_3, y_train_3, y_test_3 = train_test_split(X_3, y_3, test_size=0.25, random_state=None)
 alpha_3 = checkOptimalAlphaTrain(X_train_3, y_train_3, savefigure = 'alphaCompIntelligence.png')
 Cog2_reg, Cog2_actualvspred, Cog2_train_results= runRidgeRegPresplit(
@@ -121,8 +133,16 @@ Cog2_reg, Cog2_actualvspred, Cog2_train_results= runRidgeRegPresplit(
 
 
 
+# ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars
+
+# pred_cog_vars = ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'] + control_vars
 
 
+# X, y = splitdata_normalize(df, 'Bilat_Hippo_Vol', ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=None)
+# alpha = checkOptimalAlphaTrain(X_train, y_train, savefigure = 'alphaCompIntelligence.png')
+# All_reg, All_actualvspred, All_train_results= runRidgeRegPresplit(
+#     df, X_train, X_test, y_train, y_test, alpha=alpha)
 
 
 
