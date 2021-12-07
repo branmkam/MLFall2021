@@ -101,6 +101,16 @@ def runRidgeRegPresplit(df, X_train, X_test, y_train, y_test, alpha=1):
 
     return linreg, actualvspred, train_results
 
+def barPlotRegCoef(model, predictors, savefigure=False):
+    coef = pd.Series(model.coef_.flatten(), predictors).sort_values()
+    plt.figure(figsize=(10,8))
+ 
+    coef.plot(kind='bar', title='Model Coefficients')
+    plt.show()
+    if savefigure != False:
+        plt.savefig(savefigure)
+
+
 #X, y = splitdata_normalize(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
 #checkOptimalAlpha(X,y)
 #X,y = splitdata_normalize(df, 'FS_R_Hippo_Vol', pred_PSQI_tot_vars)
@@ -117,6 +127,8 @@ alpha_1 = checkOptimalAlphaTrain(X_train_1, y_train_1, savefigure = 'alphaTotPSQ
 TotPSQI_reg, TotPSQI_actualvspred, TotPSQI_train_results= runRidgeRegPresplit(
     df, X_train_1, X_test_1, y_train_1, y_test_1, alpha=alpha_1)
 
+barPlotRegCoef(TotPSQI_reg, ['Global PSQI', 'Gender', 'Age'])
+
 
 X_2, y_2 = splitdata_normalize(df, 'Bilat_Hippo_normICV', pred_PSQI_comp_vars)
 X_train_2, X_test_2, y_train_2, y_test_2 = train_test_split(X_2, y_2, test_size=0.25, random_state=None)
@@ -124,6 +136,7 @@ alpha_2 = checkOptimalAlphaTrain(X_train_2, y_train_2, savefigure = 'alphaCompPS
 CompPSQI_reg, CompPSQI_actualvspred, CompPSQI_train_results= runRidgeRegPresplit(
     df, X_train_2, X_test_2, y_train_2, y_test_2, alpha=alpha_2)
 
+barPlotRegCoef(CompPSQI_reg, ['PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'])
 
 X_3, y_3 = splitdata_normalize(df, 'Bilat_Hippo_normICV', pred_cog_vars)
 X_train_3, X_test_3, y_train_3, y_test_3 = train_test_split(X_3, y_3, test_size=0.25, random_state=None)
@@ -131,6 +144,7 @@ alpha_3 = checkOptimalAlphaTrain(X_train_3, y_train_3, savefigure = 'alphaCompIn
 Cog2_reg, Cog2_actualvspred, Cog2_train_results= runRidgeRegPresplit(
     df, X_train_3, X_test_3, y_train_3, y_test_3, alpha=alpha_3)
 
+barPlotRegCoef(Cog2_reg, ['Fluid Cognition', 'Crystallized Cognition', 'Gender', 'Age'])
 
 
 # ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars
@@ -138,13 +152,14 @@ Cog2_reg, Cog2_actualvspred, Cog2_train_results= runRidgeRegPresplit(
 # pred_cog_vars = ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'] + control_vars
 
 
-# X, y = splitdata_normalize(df, 'Bilat_Hippo_Vol', ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars)
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=None)
-# alpha = checkOptimalAlphaTrain(X_train, y_train, savefigure = 'alphaCompIntelligence.png')
-# All_reg, All_actualvspred, All_train_results= runRidgeRegPresplit(
-#     df, X_train, X_test, y_train, y_test, alpha=alpha)
+X, y = splitdata_normalize(df, 'Bilat_Hippo_Vol', ['PSQI_Score','CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=None)
+alpha = checkOptimalAlphaTrain(X_train, y_train)
+All_reg, All_actualvspred, All_train_results= runRidgeRegPresplit(
+    df, X_train, X_test, y_train, y_test, alpha=alpha)
 
 
+barPlotRegCoef(All_reg, ['Global PSQI','Fluid Cognition', 'Crystallized Cognition', 'PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'])
 
 
 
