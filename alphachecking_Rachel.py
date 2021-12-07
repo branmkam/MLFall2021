@@ -9,10 +9,8 @@ from sklearn import metrics
 import regressors
 from pandas import read_csv
 from sklearn.model_selection import train_test_split
-from yellowbrick.regressor import ResidualsPlot, alphas, ManualAlphaSelection
-
-
-
+from yellowbrick.regressor import ResidualsPlot,  AlphaSelection
+import matplotlib.pyplot as plt
 
 
 #import data
@@ -47,26 +45,19 @@ pred_PSQI_comp_vars = ['PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', '
 
 pred_cog_vars = ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj'] + control_vars
 
-def checkOptimalAlpha(X, y):
-    # Create a list of alphas to cross-validate against
+def checkOptimalAlphaTrain(X_train, y_train, savefigure=False):
     alphas = np.logspace(-10, 1, 400)
-
-    # Instantiate the linear model and visualizer
-    visualizer = ManualAlphaSelection(
-        Ridge(),
-        alphas=alphas,
-        cv=12,
-        scoring="neg_mean_squared_error"
-    )
-
-    visualizer.fit(X, y)
-    visualizer.show()
     
-
-def splitdata(df, feat, predictors):   
-    y = df[feat]
-    X = df[predictors]
-    return X, y
+    # Instantiate the linear model and visualizer
+    model = RidgeCV(alphas=alphas)
+    visualizer = AlphaSelection(model)
+    visualizer.fit(X_train, y_train)
+    opt_alpha = (visualizer.alpha_)
+    ax = visualizer.show()
+    if savefigure != False:
+        ax.figure.savefig(savefigure)
+    return opt_alpha
+    
 
 def splitdata_normalize(df, feat, predictors):  
     df2= df[[feat] + predictors] #returns a numpy array
@@ -78,20 +69,14 @@ def splitdata_normalize(df, feat, predictors):
     #X_int = pd.DataFrame(np.concatenate( ( np.ones((X.shape[0], 1)), X), axis = 1 ), columns = ['intercept'] + predictors)
     return X, y
 
-def runRidgeReg(df, feat, predictors, alpha=1):
-    X, y = splitdata_normalize(df, feat, predictors)
 
-    # Code from try1
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=0)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=None)
-    
-    #alpha = checkAlpha(X_train, X_test, y_train, y_test)
+def runRidgeRegPresplit(df, X_train, X_test, y_train, y_test, alpha=1):
 
     linreg = Ridge(fit_intercept=True, alpha=alpha)
     linreg.fit(X_train, y_train)
     #train_results = getcoeffandpvals(linreg, X_train, y_train)
     coefs = [linreg.intercept_] + list(linreg.coef_)
-    train_results = pd.DataFrame(coefs, (['intercept']+X.columns.to_list()), columns=['coeff'])
+    train_results = pd.DataFrame(coefs, (['intercept']+X_train.columns.to_list()), columns=['coeff'])
 
     y_pred = linreg.predict(X_test)
     actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
@@ -99,9 +84,9 @@ def runRidgeReg(df, feat, predictors, alpha=1):
     print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
     print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    
-    return linreg, X_train, X_test, y_train, y_test, actualvspred, train_results
+    print('Alpha:', alpha)
 
+    return linreg, actualvspred, train_results
 
 
 #X, y = splitdata_normalize(df, 'FS_L_Hippo_Vol', pred_PSQI_tot_vars)
@@ -114,15 +99,26 @@ def runRidgeReg(df, feat, predictors, alpha=1):
 #checkOptimalAlpha(X,y)
 
 
+X_1, y_1 = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_PSQI_tot_vars)
+X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1, y_1, test_size=0.25, random_state=None)
+alpha_1 = checkOptimalAlphaTrain(X_train_1, y_train_1, savefigure = 'alphaTotPSQI.png')
+TotPSQI_reg, TotPSQI_actualvspred, TotPSQI_train_results= runRidgeRegPresplit(
+    df, X_train_1, X_test_1, y_train_1, y_test_1, alpha=alpha_1)
 
-X, y = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_PSQI_tot_vars)
-checkOptimalAlpha(X,y)
 
-X,y = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_PSQI_comp_vars)
-checkOptimalAlpha(X,y)
+X_2, y_2 = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_PSQI_comp_vars)
+X_train_2, X_test_2, y_train_2, y_test_2 = train_test_split(X_2, y_2, test_size=0.25, random_state=None)
+alpha_2 = checkOptimalAlphaTrain(X_train_2, y_train_2, savefigure = 'alphaCompPSQI.png')
+CompPSQI_reg, CompPSQI_actualvspred, CompPSQI_train_results= runRidgeRegPresplit(
+    df, X_train_2, X_test_2, y_train_2, y_test_2, alpha=alpha_2)
 
-X,y = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_cog_vars)
-checkOptimalAlpha(X,y)
+
+X_3, y_3 = splitdata_normalize(df, 'Bilat_Hippo_Vol', pred_cog_vars)
+X_train_3, X_test_3, y_train_3, y_test_3 = train_test_split(X_3, y_3, test_size=0.25, random_state=None)
+alpha_3 = checkOptimalAlphaTrain(X_train_3, y_train_3, savefigure = 'alphaCompIntelligence.png')
+Cog2_reg, Cog2_actualvspred, Cog2_train_results= runRidgeRegPresplit(
+    df, X_train_3, X_test_3, y_train_3, y_test_3, alpha=alpha_3)
+
 
 
 
