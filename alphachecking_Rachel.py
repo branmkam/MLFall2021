@@ -37,6 +37,7 @@ def runRidgeRegPresplit(df, X_train, X_test, y_train, y_test, alpha=1):
     train_results = pd.DataFrame(coefs, (['intercept']+X_train.columns.to_list()), columns=['coeff'])
 
     y_pred = linreg.predict(X_test)
+    #actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred, 'Gender': X_test['Gender']})
     actualvspred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred, 'Difference': y_test-y_pred})
     print(actualvspred.sort_values(by='Difference', ascending=False))
     print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
@@ -154,13 +155,13 @@ regressionPlot(Cog2_reg, X_train_3, X_test_3, y_train_3, y_test_3, savefigure='M
 
 
 print('\nModel 4: Predicting HV using Sleep + Cognitive Scores \n')
-X, y = splitdata_normalize(df, 'Bilat_Hippo_Vol', ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars)
+X, y = splitdata_normalize(df, 'Bilat_Hippo_Vol', ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=None)
 alpha = checkOptimalAlphaTrain(X_train, y_train, savefigure = 'alphaModel4.png')
 All_reg, All_actualvspred, All_train_results= runRidgeRegPresplit(
     df, X_train, X_test, y_train, y_test, alpha=alpha)
 
-barPlotRegCoef(All_reg, ['Fluid Cognition', 'Crystallized Cognition', 'PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'], savefigure='Model4coef.png')
+barPlotRegCoef(All_reg, ['Fluid Cognition', 'Crystallized Cognition', 'Global PSQI', 'PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'], savefigure='Model4coef.png')
 regressionPlot(All_reg, X_train, X_test, y_train, y_test, savefigure='Model4regplot.png')
 
 
