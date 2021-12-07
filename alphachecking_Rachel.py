@@ -69,7 +69,7 @@ def barPlotRegCoef(model, predictors, savefigure=False):
     else: 
         plt.show()
         
-def regressionPlot(model, savefigure=False):
+def regressionPlot(model, X_train, X_test, y_train, y_test, savefigure=False):
     visualizer = ResidualsPlot(model)
     visualizer.fit(X_train, y_train)
     visualizer.score(X_test, y_test)
@@ -98,13 +98,12 @@ age_dict = {'22-25': 1, '26-30': 2, '31-35': 3, '36+': 4}
 df['AgeCat'] = df['Age'].replace(age_dict)
 
 
+#calculate bilateral hippocampus volume then normalize with respect to intracranial volume
 df['Bilat_Hippo_Vol'] = df['FS_L_Hippo_Vol'] + df['FS_R_Hippo_Vol']
-
 ICV, HippoVol = splitdata(df, 'FS_IntraCranial_Vol', 'Bilat_Hippo_Vol')
 ICV = pd.DataFrame(ICV)
 normlize_hippo = LinearRegression()
 normlize_hippo.fit(ICV, HippoVol)
-
 prediction = normlize_hippo.predict(ICV)
 df['Bilat_Hippo_normICV'] = (HippoVol - prediction)
 
@@ -127,8 +126,8 @@ alpha_1 = checkOptimalAlphaTrain(X_train_1, y_train_1, savefigure = 'alphaTotPSQ
 TotPSQI_reg, TotPSQI_actualvspred, TotPSQI_train_results= runRidgeRegPresplit(
     df, X_train_1, X_test_1, y_train_1, y_test_1, alpha=alpha_1)
 
-barPlotRegCoef(TotPSQI_reg, ['Global PSQI', 'Gender', 'Age'],savefigure='Model1.png')
-
+barPlotRegCoef(TotPSQI_reg, ['Global PSQI', 'Gender', 'Age'], savefigure='Model1coef.png')
+regressionPlot(TotPSQI_reg, X_train_1, X_test_1, y_train_1, y_test_1, savefigure='Model1regplot.png')
 
 print('\nModel 2: Predicting HV using PSQI Components \n')
 
@@ -138,7 +137,8 @@ alpha_2 = checkOptimalAlphaTrain(X_train_2, y_train_2, savefigure = 'alphaCompPS
 CompPSQI_reg, CompPSQI_actualvspred, CompPSQI_train_results= runRidgeRegPresplit(
     df, X_train_2, X_test_2, y_train_2, y_test_2, alpha=alpha_2)
 
-barPlotRegCoef(CompPSQI_reg, ['PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'],savefigure='Model2.png')
+barPlotRegCoef(CompPSQI_reg, ['PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'], savefigure='Model2coef.png')
+regressionPlot(CompPSQI_reg, X_train_2, X_test_2, y_train_2, y_test_2, savefigure='Model2regplot.png')
 
 
 print('\nModel 3: Predicting HV using Cognitive Scores \n')
@@ -149,7 +149,8 @@ alpha_3 = checkOptimalAlphaTrain(X_train_3, y_train_3, savefigure = 'alphaCompIn
 Cog2_reg, Cog2_actualvspred, Cog2_train_results= runRidgeRegPresplit(
     df, X_train_3, X_test_3, y_train_3, y_test_3, alpha=alpha_3)
 
-barPlotRegCoef(Cog2_reg, ['Fluid Cognition', 'Crystallized Cognition', 'Gender', 'Age'],savefigure='Model3.png')
+barPlotRegCoef(Cog2_reg, ['Fluid Cognition', 'Crystallized Cognition', 'Gender', 'Age'],savefigure='Model3coef.png')
+regressionPlot(Cog2_reg, X_train_3, X_test_3, y_train_3, y_test_3, savefigure='Model3regplot.png')
 
 
 print('\nModel 4: Predicting HV using Sleep + Cognitive Scores \n')
@@ -159,9 +160,8 @@ alpha = checkOptimalAlphaTrain(X_train, y_train, savefigure = 'alphaModel4.png')
 All_reg, All_actualvspred, All_train_results= runRidgeRegPresplit(
     df, X_train, X_test, y_train, y_test, alpha=alpha)
 
-
-barPlotRegCoef(All_reg, ['Fluid Cognition', 'Crystallized Cognition', 'PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'],savefigure='Model4.png')
-
+barPlotRegCoef(All_reg, ['Fluid Cognition', 'Crystallized Cognition', 'PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'], savefigure='Model4coef.png')
+regressionPlot(All_reg, X_train, X_test, y_train, y_test, savefigure='Model4regplot.png')
 
 
 
