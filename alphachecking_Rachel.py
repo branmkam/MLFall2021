@@ -69,7 +69,7 @@ def barPlotRegCoef(model, predictors, savefigure=False):
     else: 
         plt.show()
         
-def barPlotRegCoef(model, savefigure=False):
+def regressionPlot(model, savefigure=False):
     visualizer = ResidualsPlot(model)
     visualizer.fit(X_train, y_train)
     visualizer.score(X_test, y_test)
