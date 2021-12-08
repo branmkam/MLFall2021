@@ -61,11 +61,11 @@ def checkOptimalAlphaTrain(X_train, y_train, savefigure=False):
 
 def barPlotRegCoef(model, predictors, savefigure=False):
     coef = pd.Series(model.coef_.flatten(), predictors).sort_values()
-    plt.figure(figsize=(10,8))
+    #plt.figure(figsize=(10,8))
  
     coef.plot(kind='bar', title='Model Coefficients')
     if savefigure != False:
-        plt.savefig(savefigure)
+        plt.savefig(savefigure, bbox_inches = "tight")
         plt.show()
     else: 
         plt.show()
@@ -150,19 +150,19 @@ alpha_3 = checkOptimalAlphaTrain(X_train_3, y_train_3, savefigure = 'alphaCompIn
 Cog2_reg, Cog2_actualvspred, Cog2_train_results= runRidgeRegPresplit(
     df, X_train_3, X_test_3, y_train_3, y_test_3, alpha=alpha_3)
 
-barPlotRegCoef(Cog2_reg, ['Fluid Cognition', 'Crystallized Cognition', 'Gender', 'Age'],savefigure='Model3coef.png')
+barPlotRegCoef(Cog2_reg, ['Fluid Cog', 'Crystal Cog', 'Gender', 'Age'],savefigure='Model3coef.png')
 regressionPlot(Cog2_reg, X_train_3, X_test_3, y_train_3, y_test_3, savefigure='Model3regplot.png')
 
 
 print('\nModel 4: Predicting HV using Sleep + Cognitive Scores \n')
-X, y = splitdata_normalize(df, 'Bilat_Hippo_Vol', ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Score', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=None)
-alpha = checkOptimalAlphaTrain(X_train, y_train, savefigure = 'alphaModel4.png')
+X_4, y_4 = splitdata_normalize(df, 'Bilat_Hippo_Vol', ['CogFluidComp_AgeAdj','CogCrystalComp_AgeAdj', 'PSQI_Comp1', 'PSQI_Comp2', 'PSQI_Comp3', 'PSQI_Comp4', 'PSQI_Comp5', 'PSQI_Comp6', 'PSQI_Comp7'] + control_vars)
+X_train_4, X_test_4, y_train_4, y_test_4 = train_test_split(X_4, y_4, test_size=0.25, random_state=None)
+alpha_4 = checkOptimalAlphaTrain(X_train_4, y_train_4, savefigure = 'alphaModel4.png')
 All_reg, All_actualvspred, All_train_results= runRidgeRegPresplit(
-    df, X_train, X_test, y_train, y_test, alpha=alpha)
+    df, X_train_4, X_test_4, y_train_4, y_test_4, alpha=alpha_4)
 
-barPlotRegCoef(All_reg, ['Fluid Cognition', 'Crystallized Cognition', 'Global PSQI', 'PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'], savefigure='Model4coef.png')
-regressionPlot(All_reg, X_train, X_test, y_train, y_test, savefigure='Model4regplot.png')
+barPlotRegCoef(All_reg, ['Fluid Cog', 'Crystal Cog', 'PSQI-1', 'PSQI-2', 'PSQI-3', 'PSQI-4', 'PSQI-5', 'PSQI-6', 'PSQI-7', 'Gender', 'Age'], savefigure='Model4coef.png')
+regressionPlot(All_reg, X_train_4, X_test_4, y_train_4, y_test_4, savefigure='Model4regplot.png')
 
 
 
